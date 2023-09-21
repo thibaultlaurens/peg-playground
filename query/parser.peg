@@ -1,0 +1,101 @@
+{
+package query
+}
+
+// Non Terminal Rules
+
+Query
+  = aq:AndQuery _ aqs:OrQuery* _ {
+    return newQuery(aq, aqs)
+  }
+
+OrQuery
+  = _ '|' _ aq:AndQuery _ {
+    return aq, nil
+  }
+
+AndQuery
+  = _ fq:FieldQuery _ fqs:FieldQuery* _ {
+    return newAndQuery(fq, fqs)
+  }
+
+FieldQuery
+   = _ '(' _ q:Query _ ')'_ {
+        return newFieldQueryFromQuery(q)
+      }
+   / _ f:Field _ {
+        return newFieldQueryFromField(f)
+     }
+
+Field
+  = src:Source _ op:Operator _ value:Value {
+      return newField(src, op, value)
+  }
+
+Source
+  = name:Identifier path:("."Identifier)* {
+      return newSource(name, path)
+}
+
+Value
+  = val:(
+      Measure
+    / Float
+    / Integer
+    / Identifier
+    / String
+    ){
+    return val, nil
+  }
+
+Measure
+  = number:(Integer / Float) unit:Identifier {
+    return newMeasure(number, unit)
+  }
+
+// Terminal Rules
+
+Operator
+  = op:(
+     "<="
+    / ">="
+    / "="
+    / "<"
+    / ">"
+  ){
+    return string(c.text), nil
+  }
+
+Identifier
+  = [a-zA-Z0-9_]+ {
+      return string(c.text), nil
+}
+
+String
+  = '"' chars:[^"]* '"' {
+    return string(c.text[1:len(c.text)-1]), nil
+  }
+
+/*
+String
+  = '"' chars:[^"]* '"' {
+    return stringFromChars(chars), nil
+  }
+*/
+
+Integer
+  = [+-]? [0-9]+ {
+    return strconv.ParseInt(string(c.text), 10, 64)
+  }
+
+Float
+  = [+-]? ([0-9]* "." [0-9]+ ) {
+      return strconv.ParseFloat(string(c.text), 64)
+    }
+_
+  = [ \t]* {
+      return "", nil
+ }
+
+EOF
+  = !.
