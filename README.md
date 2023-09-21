@@ -37,3 +37,10 @@ Run the unit tests:
 ```
 go test -v ./query
 ```
+
+## Resources
+
+- [Pegged Tutorial](https://github.com/PhilippeSigaud/Pegged/wiki/Pegged-Tutorial)
+- [PEG Lib and Parser Generator](https://www.codeproject.com/Articles/29713/Parsing-Expression-Grammar-Support-for-C-3-0-Part)
+- [Ledger plain text accounting format parser](https://github.com/timraymond/ledger)
+- [Building a simple query parser using PEG in Go](https://prasanthmj.github.io/go/peg-parser-in-go/)
